@@ -27,7 +27,7 @@ const int    LINE_SPACING   = 20;    // Top of one line to the top of next
 const int    STARTING_X     = 50;    // Initial line placement and size
 const int    STARTING_Y     = 50;
 const int    STARTING_WIDTH = 700;
-const bool   DO_COLORS      = false;  // B&W drawing or rainbow colors
+const bool   DO_COLORS      = true;  // B&W drawing or rainbow colors
 const string COLORS[]       = {"MAGENTA", "BLUE", "CYAN", // Rainbow colors
                                "GREEN", "YELLOW", "ORANGE", "RED"};
 const int    N_COLORS       = sizeof(COLORS) / sizeof(string); // take CS107
@@ -94,7 +94,8 @@ void cantorSet(GWindow& window, int x, int y, int length, int levels)
         // left third
         cantorSet(window, x, newY, newLength, newLevels);
         // right third
-        cantorSet(window, x + (2 * length / 3), newY, newLength, newLevels);
+        int rightX = x + (2 * length / 3);
+        cantorSet(window, rightX, newY, newLength, newLevels);
     }
 }
 
