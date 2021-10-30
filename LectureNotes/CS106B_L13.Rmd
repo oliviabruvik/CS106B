@@ -1,0 +1,179 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 13: Recursive Backtracking Wrap"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+# Lecture 13 {.tabset}
+
+## Topics
+- Visualizing recursive backtracking as a decision tree
+- Applying our recursive backtracking template to a new problems
+- Theme and variations: state speller code example
+
+## Backtracking template
+```{Rcpp, eval = FALSE}
+bool backtrackingRecursiveFunction(args) {
+  Base case test for success: return true;
+  Base case test for failure: return false;
+  Loop over available options for "what to do next";
+    1. Tentatively "choose" one option
+    2. if ("explore" with recursive call returns true) return true;
+    3. else that tentative idea didn't work, so "un-choose" that option, but don't return false yet! let the loop explore the other options before giving up!
+  None of the options we tried in the loop worked, so return false;
+}
+```
+
+## Template applications
+1. Combination lock
+    + Goal: find combo that unlocks
+    + Choose/unchoose: {0-9} which digit to extend combo
+    + Base case: combo is full length, does it open lock?
+2. Combination lock
+    + Goal: spend card down to zero
+    + Choose/unchoose: {yes-no} whether to buy item
+    + Base case: no money on gift card, no items left to consider
+3. Combination lock
+    + Goal: exit maze
+    + Choose/unchoose: {N-S-E-W} which direction to move
+    + Base case: found exit
+    
+## Recusive exploration as "decision tree"
+1. Width: count of horizontal branches at each decision point
+    + more branches = more options to choose from
+2. Depth: count of vertical levels
+    + taller tree = more decisions to make
+3. Exponential growth: exhaustive exploration of entire tree is $O(W^{D})$
+
+## State speller
+Which words can be spelled out of state postal codes? CO + DE = CODE!
+
+```{Rcpp, eval = FALSE}
+void printStateWords(int n, Set<string>& states, Lexicon& lex, string sofar) {
+  if (n == 0) {
+    if (lex.contains(sofar)) {
+      cout << sofar << endl;
+    }
+  } else {
+    for (string option : states) {
+      printStateWords(n - 1, states, lex, sofar + option);
+    }
+  }
+}
+```
+
+## State speller variations {.tabset}
+### prune dead ends (not valid prefix)
+```{Rcpp, eval = FALSE}
+void printAll(Set<string>& states, Lexicon& lex, string sofar)
+{
+    if (!lex.containsPrefix(sofar)) {
+        return;
+    } else if (lex.contains(sofar)) {
+        cout << sofar << endl;
+    }
+    for (string option : states) {
+        printAll(states, lex, sofar + option);
+    }
+}
+```
+
+### allow/disallow repeat of postal codes in word
+(combos vs permute)
+NB! Create new set to avoid modifying ADT in loop.
+```{Rcpp, eval = FALSE}
+void printNoRepeat(Set<string>& states, Lexicon& lex, string sofar)
+{
+    if (!lex.containsPrefix(sofar)) {
+        return;
+    } else if (lex.contains(sofar)) {
+        cout << sofar << endl;
+    }
+    for (string option : states) {
+        Set<string> rest = states - option;
+        printNoRepeat(rest, lex, sofar + option);
+    }
+}
+```
+
+### stop at first word found, return true/false 
+```{Rcpp, eval = FALSE}
+bool findOne(Set<string>& states, Lexicon& lex, string sofar)
+{
+    if (!lex.containsPrefix(sofar)) {
+        return false;
+    } else if (lex.contains(sofar)) {
+        return true;
+    }
+    for (string option : states) {
+        if (findOne(states, lex, sofar + option))
+            return true;
+    }
+    return false;
+}
+```
+
+### stop at first word found, return word
+```{Rcpp, eval = FALSE}
+string findWord(Set<string>& states, Lexicon& lex, string sofar)
+{
+    if (!lex.containsPrefix(sofar)) {
+        return "";
+    } else if (lex.contains(sofar)) {
+        return sofar;
+    }
+    for (string option : states) {
+        string result = findWord(states, lex, sofar + option);
+        if (!result.empty()) return result;
+    }
+    return "";
+}
+```
+
+### return longest word found
+```{Rcpp, eval = FALSE}
+string findLongest(Set<string>& states, Lexicon& lex, string sofar)
+{
+    string best;
+
+    if (!lex.containsPrefix(sofar)) {
+        return "";
+    } else if (lex.contains(sofar)) {
+        best = sofar;
+    }
+    for (string option : states) {
+        string cur = findLongest(states, lex, sofar + option);
+        if (cur.length() > best.length()) {
+            best = cur;
+        }
+    }
+    return best;
+}
+```
+
+
+## Summary
+1. Identify how problem has recursive, self-similar structure
+    + Diagram as decision tree, sequence of decisions is path down tree
+    + Nibble off one decision, recurse on rest
+    + Each decision progresses to smaller/simpler version of the same problem
+2. Fit to backtracking template
+    + Base cases: success and failure
+    + Choose/explore/unchoose
+3. How to model state of exploration
+    + Update/communicate state into and out of recursive calls
+    + How to loop/enumerate options
+4. Theme and variations
+    + Print all
+    + Count
+    + Find one
+    + Find all
+    + Find optimal
+

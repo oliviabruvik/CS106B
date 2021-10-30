@@ -1,0 +1,321 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Section 4: Recursive Backtracking"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 4: Recursive Backtracking {.tabset}
+
+## Material
+<https://web.stanford.edu/class/cs106b/section/section4/>
+
+- recursive backtracking
+
+## Q2: Change We Can Believe In (change.cpp) {.tabset}
+Topic: Recursive Backtracking
+
+### Problem 
+In the US, as is the case in most countries, the best way to give change for any total is to use a greedy strategy – find the highest-denomination coin that’s less than the total amount, give one of those coins, and repeat. For example, to pay someone 97¢ in the US in cash, the best strategy would be to
+
+    give a half dollar (50¢ given, 47¢ remain), then
+    give a quarter (75¢ given, 22¢ remain), then
+    give a dime (85¢ given, 12¢ remain), then
+    give a dime (95¢ given, 2¢ remain), then
+    give a penny (96¢ given, 1¢ remain), then
+    give another penny (97¢ given, 0¢ remain).
+
+This uses six total coins, and there’s no way to use fewer coins to achieve the same total.
+
+However, it’s possible to come up with coin systems where this greedy strategy doesn’t always use the fewest number of coins. For example, in the tiny country of Recursia, the residents have decided to use the denominations 1¢, 12¢, 14¢, and 63¢, for some strange reason. So suppose you need to give back 24¢ in change. The best way to do this would be to give back two 12¢ coins. However, with the greedy strategy of always picking the highest-denomination coin that’s less than the total, you’d pick a 14¢ coin and ten 1¢ coins for a total of eleven coins. That’s pretty bad!
+
+Your task is to write a function
+
+int fewestCoinsFor(int cents, Set<int>& coins)
+
+that takes as input a number of cents and a Set indicating the different denominations of coins used in a country, then returns the minimum number of coins required to make change for that total. In the case of US coins, this should always return the same number as the greedy approach, but in general it might return a lot fewer!
+
+You can assume that the set of coins always contains a 1¢ coin, so you never need to worry about the case where it’s simply not possible to make change for some total. You can also assume that there are no coins worth exactly 0¢ or a negative number of cents. Finally, you can assume that the number of cents to make change for is nonnegative.
+
+Makes cents? I certainly hope so.
+
+### Solution
+
+```{Rcpp, eval = FALSE}
+int fewestCoinsForHelper(int cents, Set<int>& coins, int curNum, int bestNum) {
+    
+    if (curNum >= bestNum) return bestNum;
+    if (cents == 0) {
+        return (curNum <= bestNum) ? curNum : bestNum;
+    }
+
+    for (int coin : coins) {
+        if (coin <= cents) {
+            bestNum = fewestCoinsForHelper(cents - coin, coins, curNum + 1, bestNum);
+        }
+    }
+    return bestNum;
+}
+
+int fewestCoinsFor(int cents, Set<int>& coins) {
+    return(fewestCoinsForHelper(cents, coins, 0, cents));
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+int fewestCoinsFor(int cents, Set<int>& coins) {
+	/* Base case: You need no coins to give change for no cents. */
+	if (cents == 0) {
+		return 0;
+	}
+	/* Recursive case: try each possible coin that doesn’t exceed the total as
+	* as our first coin.
+	*/
+	else {
+		int bestSoFar = cents + 1; // Can never need this many coins;
+		for (int coin: coins) {
+			/* If this coin doesn’t exceed the total, try using it. */
+			if (coin <= cents) {
+				bestSoFar = min(bestSoFar, 
+					fewestCoinsFor(cents - coin, coins));
+			}
+		}
+		return bestSoFar + 1; // For the coin we just used.
+ 	}
+}
+```
+
+
+## Q3: Longest Common Subsequence (lcs.cpp) {.tabset}
+Topic: Recursive Backtracking
+
+### Problem
+Write a recursive function named longestCommonSubsequence that returns the 
+longest common subsequence of two strings passed as arguments. Some example 
+function calls and return values are shown below.
+
+Recall that if a string is a subsequence of another, each of its letters occurs 
+in the longer string in the same order, but not necessarily consecutively.
+
+Hint: In the recursive case, compare the first character of each string. What 
+one recursive call can you make if they are the same? What two recursive calls 
+do you try if they are different?
+
+`longestCommonSubsequence("cs106a", "cs106b") --> "cs106" `
+`longestCommonSubsequence("nick", "julie") --> "i" `
+`longestCommonSubsequence("karel", "c++") --> "" `
+`longestCommonSubsequence("she sells", "seashells") --> "sesells"`
+
+### Solution
+```{Rcpp, eval = FALSE} 
+string longestCommonSubsequence(string s1, string s2){
+    if (s1.size() == 0 || s2.size() == 0) {
+        return "";
+    } else {
+        if (s1[0] == s2[0]) {
+            return s1[0] + longestCommonSubsequence(s1.substr(1), s2.substr(1));
+        } else {
+            string lcs1 = longestCommonSubsequence(s1.substr(1), s2);
+            string lcs2 = longestCommonSubsequence(s1, s2.substr(1));
+            return (lcs1.size() >= lcs2.size()) ? lcs1 : lcs2;
+        }
+    }
+}
+```
+
+#### Posted solution
+```{Rcpp, eval = FALSE}
+string longestCommonSubsequence(string s1, string s2) {
+	if (s1.length() == 0 || s2.length() == 0) {
+		return "";
+ 	} else if (s1[0] == s2[0]) {
+ 		return s1[0] + longestCommonSubsequence(s1.substr(1), 
+ 							s2.substr(1));
+ 	} else {
+ 		string choice1 = longestCommonSubsequence(s1, s2.substr(1));
+		string choice2 = longestCommonSubsequence(s1.substr(1), s2);
+		if (choice1.length() >= choice2.length()) {
+			return choice1;
+		} else {
+			return choice2;
+		}
+	}
+}
+```
+
+## Q4) Cracking Passwords(crack.cpp) {.tabset}
+Topic: Recursive Backtracking
+
+### Problem
+Write a function crack that takes in the maximum length a site allows for a user's password and tries to find the password into an account by using recursive backtracking to attempt all possible passwords up to that length (inclusive). Assume you have access to the function bool login(string password) that returns true if a password is correct. You can also assume that the passwords are entirely alphabetic and case-sensitive. You should return the correct password you find, or the empty string if you cannot find the password. You should return the empty string if the maximum length passed is 0 or throw an integer exception if the length is negative.
+
+Security note: The ease with which computers can brute-force passwords is the reason why login systems usually permit only a certain number of login attempts at a time before timing out. It’s also why long passwords that contain a variety of different characters are better! Try experimenting with how long it takes to crack longer and more complex passwords. See the comic here for more information: https://xkcd.com/936/
+
+### Solution
+```{Rcpp, eval = FALSE}
+string crackingPasswordsHelper(int n, string password, string alphabet) {
+
+    // Success base case
+    if (login(password)) {
+        return password;
+    }
+
+    if (n == 0) {
+        return "";
+    }
+
+    for (char letter : alphabet) {
+        string possiblePassword = crackingPasswordsHelper(n - 1,
+                                                          password + letter,
+                                                          alphabet);
+        if (possiblePassword != "") {
+            return possiblePassword;
+        }
+    }
+    return "";
+}
+
+string crackingPasswords(int n) {
+    if (n < 0) {
+        error("negative length");
+    }
+    string alphabet = "abcdefghijklmnopqrstuvwxyz";
+    alphabet += toUpperCase(alphabet);
+    return crackingPasswordsHelper(n, "", alphabet);
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+string crackHelper(string soFar, int maxLength) {
+	if (login(soFar)) {
+		return soFar;
+	}
+	if (soFar.size() == maxLength) {
+		return "";
+	}
+	for (char c = 'a'; c <= 'z'; c++) {
+		string password = crackHelper (soFar + c, maxLength);
+		if (password != "") {
+			return password;
+		}
+ 		// Also check uppercase
+ 		char upperC = toupper(c);
+ 		password = crackHelper (soFar + upperC, maxLength);
+		if (password != "") {
+ 			return password;
+ 		}
+ 	}
+	return "";
+}
+
+string crack(int maxLength) {
+	if (maxLength < 0) {
+ 		throw maxLength;
+	}
+ 	return crackHelper("", maxLength);
+}
+```
+
+## Q5) The Knapsack Problem (knapsack.cpp) {.tabset}
+
+### Problem
+As a challenge problem, we encourage you to explore solving the quintessential optimization challenge of the knapsack problem. As a reminder from lecture, here is the problem setup. <br>
+
+Imagine yourself in a new lifestyle as a professional wilderness survival expert. You are about to set off on a challenging expedition, and you need to pack your knapsack (or backpack) full of supplies. You have a list full of supplies (each of which has a survival value and a weight associated with it) to choose from. Your backpack is only sturdy enough to hold a certain amount of weight. The question is: How can you maximize the survival value of your backpack? <br>
+
+Assume each item in your backpack is modeled with the following struct: <br>
+```
+struct BackpackItem {
+    int survivalValue;  // You can assume this value will always >= 0
+    int weight;         // You can assume this value will always >= 0
+};
+```
+
+Your goal is to implement the following function: `int fillBackpack(Vector<BackpackItem>& items, int targetWeight);` which given a list of all possible items that you can take with you and the maximum weight that your backpack can hold, returns the maximum survival value that you can achieve by filling the backpack.
+
+### Solution
+```{Rcpp, eval = FALSE}
+struct BackpackItem {
+    int survivalValue;  // You can assume this value will always >= 0
+    int weight;         // You can assume this value will always >= 0
+};
+
+int fillBackpack(Vector<BackpackItem>& items, int targetWeight, int survivalValue, int index){
+    if (index >= items.size()) {
+        if (targetWeight >= 0) {
+            return survivalValue;
+        } else {
+            return 0;
+        }
+    } else {
+        return max(fillBackpack(items,
+                                targetWeight - items[index].weight,
+                                survivalValue + items[index].survivalValue,
+                                index + 1),
+                   fillBackpack(items,
+                                targetWeight,
+                                survivalValue,
+                                index + 1));
+    }
+}
+
+int fillBackpack(Vector<BackpackItem>& items, int targetWeight){
+    return fillBackpack(items, targetWeight, 0, 0);
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+int fillBackpackHelper(Vector<BackpackItem>& items, int capacityRemaining, int curValue, int index){
+    /* Base Case: If there is no more capacity in the backpack to hold things,
+     * then we can no longer fit any more value in.
+     */
+    if (capacityRemaining < 0) {
+        return 0;
+    }
+    /* Base Case: If we have run out of items to consider, then the best value we
+     * can get is what we've built up so far.
+     */
+    else if (index == items.size()){
+        return curValue;
+    } else {
+        /* Choose: Select an item to decide whether to bring along or not.
+         */
+        BackpackItem curItem = items[index];
+
+        /* Explore: Try including the item and not including it, and keep track
+         * of the best possible value in each case. */
+        int bestValueWithout = fillBackpackHelper(items,
+                                                  capacityRemaining,
+                                                  curValue,
+                                                  index + 1);
+
+        int bestValueWith = fillBackpackHelper(items,
+                                               capacityRemaining - curItem.weight,
+                                               curValue + curItem.survivalValue,
+                                               index + 1);
+
+        /* Unchoose: No explicit unchoose necessary since no changes to data
+         * structures have been made.
+         */
+
+        /* The final value we return is the best of the two options we tried. */
+        return max(bestValueWith, bestValueWithout);
+    }
+}
+
+int fillBackpack(Vector<BackpackItem>& items, int targetWeight){
+    return fillBackpackHelper(items, targetWeight, 0, 0);
+}
+```
+
+
+
+

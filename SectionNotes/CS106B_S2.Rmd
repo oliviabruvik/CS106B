@@ -1,0 +1,370 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Section 2: ADTs, Big-O, and Intro to Recursion"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 2: ADTs, Big-O, and Intro to Recursion {.tabset}
+
+## Material
+<https://web.stanford.edu/class/cs106b/section/section2/>
+
+- ADTs,
+- Big O notation,
+- Recursion
+
+## 9) Friend List (friendlist.cpp) {.tabset}
+Topic: Maps
+
+### Problem
+Write a function named friendList that takes in a file name, reads friend relationships from the file, and writes them to a Map. friendList should return the populated Map. Friendships are bi-directional, so if Abby is friends with Barney, Barney is friends with Abby. The file contains one friend relationship per line, with names separated by a single space. You do not have to worry about malformed entries. <br>
+
+If an input file named buddies.txt looked like this:
+
+`Barney Abby` <br>
+`Abby Clyde`
+
+Then the call of friendList("buddies.txt") should return a resulting map that looks like this: <br>
+
+`{"Abby":{"Barney", "Clyde"}, "Barney":{"Abby"}, "Clyde":{"Abby"}}`
+
+Here is the function prototype you should implement:
+
+`Map<string, Vector<string> > friendList(String filename)`
+
+### Solution
+
+```{Rcpp, eval = FALSE}
+Map<string, Vector<string>> friendList(string filename) {
+    ifstream in;
+    Vector<string> lines;
+    
+    if (openFile(in, filename)) {
+      readEntireFile(in, lines);
+    }
+    
+    Map<string, Vector<string>> friendList;
+    for (string line : lines) {
+        Vector<string> friendPair = stringSplit(line, " ");
+        friendList[friendPair[1]] += friendPair.subList(0, 1);
+        friendList[friendPair[0]] += friendPair.subList(1, 1);
+    }
+
+    return friendList;
+}
+
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+Map<string, Vector<string> > friendList(string filename) {
+    ifstream in;
+    Vector<string> lines;
+
+    if (openFile(in, filepath)) {
+        readEntireFile(in, lines);
+    }
+
+    Map<string, Vector<string> > friends;
+    for (string line: lines) {
+        Vector<string> people = stringSplit(line, " ");
+        string s1 = people[0];
+        string s2 = people[1];
+        friends[s1] += s2;
+        friends[s2] += s1;
+    }
+    return friends;
+}
+```
+
+## 10) Twice (twice.cpp) {.tabset}
+Topic: Sets
+
+### Problem
+Write a function named twice that takes a vector of integers and returns a set containing all the numbers in the vector that appear exactly twice.
+
+`Example: passing {1, 3, 1, 4, 3, 7, -2, 0, 7, -2, -2, 1} returns {3, 7}.`
+
+### Solution
+```{Rcpp, eval = FALSE}
+Set<int> twice(Vector<int> nums){
+    Set<int> numOnce;
+    Set<int> numTwice;
+    Set<int> numMore;
+
+    for (int num : nums) {
+        if (numTwice.contains(num) || numMore.contains(num)) {
+            numTwice.remove(num);
+            numMore.add(num);
+        } else if (numOnce.contains(num)) {
+            numTwice.add(num);
+        } else {
+            numOnce.add(num);
+        }
+    }
+    return numTwice;
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+Set<int> twice(Vector<int>& v) {
+    Set<int> once;
+    Set<int> twice;
+    Set<int> more;
+    for (int i : v) {
+        if (once.contains(i)) {
+            once.remove(i);
+            twice.add(i);
+        } else if (twice.contains(i)) {
+            twice.remove(i);
+            more.add(i);
+        } else if (!more.contains(i)) {
+            once.add(i);
+        }
+    }
+    return twice;
+}
+```
+
+## Q3: Reversing a Map (reverse.cpp) {.tabset}
+Topic: Nested data structures
+
+### Problem
+Write a function <br> 
+`Map<int, Set<string>> reverseMap(Map<string, int>& map)` <br>
+that, given a `Map<string, int>` that associates string values with integers, produces a `Map<int, Set<string>>` that’s essentially the reverse mapping, associating each integer value with the set of strings that map to it. (This is an old job interview question from 2010.)
+
+### Solution
+```{Rcpp, eval = FALSE}
+Map<int, Set<string>> reverseMap(Map<string, int>& map) {
+    Map<int, Set<string>> result;
+    for (string str : map) {
+        int n = map[str];
+        result[n] += str;
+    }
+    return result;
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+Map<int, Set<string>> reverseMap(Map<string, int>& map) {
+    Map<int, Set<string>> result;
+    for (string oldKey : map) {
+        if (!result.containsKey(map[oldKey])){
+            result[map[oldKey]] = {};
+        }
+        result[map[oldKey]].add(oldKey);
+    }
+    return result;
+}
+```
+
+## Q4: Oh No, Big-O, Too Slow {.tabset}
+Topics: Big-O, code analysis
+
+### Problem
+Give a tight bound of the nearest runtime complexity class for each of the following code fragments in Big-Oh notation, in terms of the variable N.
+
+Code Snippet A: O(n)
+```{Rcpp, eval = FALSE}
+int sum = 0;
+for (int i = 1; i <= N + 2; i++) {
+    sum++;
+}
+for (int j = 1; j <= N * 2; j++) {
+    sum++;
+}
+cout << sum << endl;
+```
+
+Code Snippet B: O(N * N/2) = O(N^2)
+```{Rcpp, eval = FALSE}
+int sum = 0;
+for (int i = 1; i <= N - 5; i++) {
+    for (int j = 1; j <= N - 5; j += 2) {
+        sum++;
+    }
+}
+cout << sum << endl;
+```
+
+Code Snippet C: O(1)
+```{Rcpp, eval = FALSE}
+int sum = 0;
+for (int i = 0; i < 1000000; i++) {
+    for (int j = 1; j <= i; j++) {
+        sum += N;
+    }
+    for (int j = 1; j <= i; j++) {
+        sum += N;
+    }
+    for (int j = 1; j <= i; j++) {
+        sum += N;
+    }
+}
+cout << sum << endl;
+```
+
+## Q5: More Big O 
+### Problem
+Below are five functions. Determine the big-O runtime of each of those pieces of code, in terms of the variable n.
+
+```{Rcpp, eval = FALSE}
+// O(n)
+void function1(int n) {
+    for (int i = 0; i < n; i++) {
+        cout << '*' << endl;
+    }
+}
+
+// O(n^2)
+void function2(int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << '*' << endl;
+        }
+    }
+}
+
+// O(n^2)
+void function3(int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            cout << '*' << endl;
+        }
+    }
+}
+
+// O(log n)
+void function4(int n) { 
+    for (int i = 1; i <= n; i *= 2) {
+        cout << '*' << endl;
+    }
+}
+```
+
+```{Rcpp, eval = FALSE}
+
+// O(n^2)
+int squigglebah(Vector<int>& v) {
+    int result = 0;
+    for (int i = 0; i < v.size(); i++) {
+        // do O(i) work;
+        Vector<int> values = v.subList(0, i);
+        // do O(i) work;
+        for (int j = 0; j < values.size(); j++) {
+            result += values[j];
+        }
+    }
+    return result;
+}
+```
+
+## Q6: Recursion Mystery Part 1
+Topics: recursive function calls, return value tracing
+
+### Problem
+Code Snippet A
+
+```{Rcpp, eval = FALSE}
+int recursionMystery(int x, int y) {
+    if (x < y) {
+        return x;
+    } else {
+        return recursionMystery(x - y, y);
+    }
+}
+```
+
+For each call to the above recursive function, indicate what value is returned by the function call.
+
+`Call                                   Return value`  
+`recursionMystery(6, 13);               6` <br>
+`recursionMystery(14, 10);              4` <br>
+`recursionMystery(37, 12);              1`
+
+## Q7: Recursion Mystery Part 2
+Topics: recursive function calls, output tracing
+
+### Problem
+```{Rcpp, eval = FALSE}
+void recursionMystery2(int x, int y) {
+    if (y == 1) { 
+        cout << x;
+    } else {
+        cout << (x * y) << ", ";
+        recursionMystery2(x, y - 1);
+        cout << ", " << (x * y);
+    } 
+}
+```
+
+For each call to the above recursive function, write the output that would be produced, as it would appear on the console.
+
+`Call                                   Output` <br>
+`recursionMystery2(4, 1);               4` <br>
+`recursionMystery2(4, 2);               8, 4, 8` <br>
+`recursionMystery2(8, 2);               16, 8, 16` <br>
+`recursionMystery2(4, 3);               12, 8, 4, 8, 12` <br>
+`recursionMystery2(3, 4);               12, 9, 6, 3, 6, 9, 12` <br>
+
+## Q8: Recursion Tracing {.tabset}
+Topics: Recursion, strings, recursion tracing
+
+### Problem
+Below is a recursive function to reverse a string.
+
+```{Rcpp, eval = FALSE}
+string reverseOf(string s) {
+    if (s.empty()) {
+        return "";
+    } else {
+        return reverseOf(s.substr(1)) + s[0];
+    }
+}
+```
+
+Trace through the execution of `reverseOf("stop")` along the lines of what we did in lecture, showing recursive call information for each call that’s made and how the final value gets computed.
+
+### Solution
+reverseOf(top) + s <br>
+reverseOf(op) + s <br>
+reverseOf(p) + s <br>
+reverseOf() + "" <br>
+"" pots <br>
+
+## Q9) Sum of Squares (squares.cpp) {.tabset}
+Topics: Recursion
+
+### Problem
+Write a recursive function named `sumOfSquares` that takes an int n and returns the sum of squares from 1 to n. For example, `sumOfSquares(3)` should return 1^2 + 2^2 + 3^2 = 14. If n is negative, you should report an error to that effect.
+
+### Solution
+```{Rcpp, eval = FALSE}
+int sumOfSquares(int n) {
+    if (n == 0) return 0;
+    if (n < 0) error("n cannot be negative");
+    return n * n + sumOfSquares(n-1);
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+int sumOfSquares(int n) {
+    if (n < 0) {
+        error("Value of provided n was negative");
+    } else if (n == 0) {
+        return 0;
+    } else {
+        return n * n + sumOfSquares(n-1);
+    }
+}
+```

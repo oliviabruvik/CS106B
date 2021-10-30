@@ -1,0 +1,104 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 14: Sorting Algorithms"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 14 {.tabset}
+
+## Topics
+- Selection sort
+- Bubble sort
+- Insertion sort
+- Merge sort
+- Quicksort
+
+## Selection sort
+
+### Implementation
+```{Rcpp, eval = FALSE}
+void sort(Vector<int>& vec) {
+  int n = vec.size();
+  // already-fully-sorted section grows 
+  // 1 at a time from left to right
+  for (int lh = 0; lh < n; lh++) {
+    int rh = lh;
+    // find the min element in the
+    // entire unsorted section
+    for (int i = lh + 1; i < n; i++) {
+      // found new min?
+      if (vec[i] < vec[rh]) rh = i; 
+    }
+    // swap min into sorted section
+    int tmp = vec[lh]; 
+    vec[lh] = vec[rh]; 
+    vec[rh] = tmp;
+  }
+}
+```
+
+### Efficiency
+Best case = Worst case: O(N^2)
+
+## Bubble sort
+Don't use!
+
+## Insertion sort
+
+### Implementation
+```{Rcpp, eval = FALSE}
+void sort(Vector<int>& vec) {
+  int n = vec.size();
+  // already-sorted section grows 1 at a 
+  // time from left to right
+  for (int i = 1; i < n; i++) {
+    int j = i;
+    // does this item needs to move
+    // left to be in order?
+    while (j > 0 && vec[j-1] > vec[j]) {
+      // keep swapping this item with
+      // its left neighbor if it is
+      // smaller than the left neighbor
+      int tmp = vec[j-1]; 
+      vec[j-1] = vec[j]; 
+      vec[j] = tmp;
+      j--; 
+    }
+  }
+}
+```
+
+### Efficiency
+Best case < Worst case
+
+## Mergesort
+Divide and conquer algorithm
+
+### Implementation
+- Use binary merge algorithm
+- Repeat until the two starting piles are empty and the combined-sorted pile is empty
+
+### Efficiency
+- How many times does each element pass through the merge algorithm? `O(log n)`
+- Merge sort performs O(N) operations on each level (width)
+    + Each level splits the data in 2, so there are log2N levels (height)
+    + Product of these: N * log_2{N} = O(N log N)
+
+## Quicksort
+Divide and conquer algorithm
+
+### Implementation
+- recursively sort each half (i.e. students in classroom separate themselves in two rough groups around a midpoint)
+- Midpoint
+    + choose arbitrary or random element to be divider
+    + efficiency depends on how close midpoint is to the median
+    
+### Efficiency
+Best case < Worst case: O(NlogN)
+    
