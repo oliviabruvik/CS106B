@@ -1,0 +1,47 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 2: Testing Framework"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 2 {.tabset}
+
+## Topics
+- Testing framework
+- Miscellaneous
+
+## CS106B Testing Framework
+
+In main(), write:
+```{r, eval = FALSE}
+runSimpleTests(SELECTED_TESTS;
+```
+
+Write tests as:
+```{r, eval = FALSE}
+EXPECT_EQUAL(functionBeingTested(input), expectedOutput);
+EXPECT_EQUAL(generateLyrics(2), "Da Da ");
+EXPECT_EQUAL(generateLyrics(3), "Da Da Dat ");
+EXPECT_EQUAL(generateLyrics('3'), X); # What happens? Error: data type?
+EXPECT_EQUAL(generateLyrics(8), "Da Da Dat Da Da Dat Da Ya Da ");
+
+```
+
+*check out Resources and Testing guide*
+
+## Miscellaneous
+- count starts at 0
+- constants have ALL_CAPS
+- variable names camelCase
+- const int - cannot change variable
+- LINE UP VARIABLES: 
+  + const int DAT_AMOUNT = 3;
+  + const int  YA_AMOUNT = 8;
+- no magic numbers (random wo/ context)
+- text cases comes at bottom of starter code
