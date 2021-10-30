@@ -1,0 +1,36 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Stanford University"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(knitr.duplicate.label='allow')
+```
+
+```{r child = "CS106B_L13.Rmd"}
+```
+
+```{r child = "CS106B_L9.Rmd"}
+```
+
+```{r child = "CS106B_L8.Rmd"}
+```
+
+```{r child = "CS106B_L7.Rmd"}
+```
+
+```{r child = "CS106B_L4.Rmd"}
+```
+
+```{r child = "CS106B_L3.Rmd"}
+```
+
+```{r child = "CS106B_L1.Rmd"}
+```
+
+<!-- # ```{r child = "CS106B_notes.Rmd"} -->
+<!-- # ``` -->
+

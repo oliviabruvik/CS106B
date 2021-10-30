@@ -1,0 +1,64 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 3"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 3 {.tabset}
+
+## Topics
+1. String library
+2. Testing
+3. Passing by value/reference
+4. Ethics
+
+## Standard string library
+- Pound include importation: `Rcpp #include "strlib.h"`
+- Takes the string as a parameter
+
+## Style: writing good tests
+##### "Good" means thorough
+- covers all code paths and cases
+- Each test (if, else if, else) should be thoughtful
+
+##### Include edge cases
+- Common examples for integer inputs: 
+    + negative numbers
+    + zero
+    + very large numbers
+- Common examples for string inputs:
+    + very short strings (length 0 or 1)
+    + very long strings
+
+## Parameter behavior
+### Passing by value
+`Rcpp void foo(int n) n++;` <br>
+Makes a copy of the parameter value and then leaves the original variable unchanged.
+
+### Passing by reference
+`Rcpp void foo(int& n) n++;` <br>
+
+- uses ambersand, &
+- think of a rope lasso that grabs the input parameter and drags it into the function call directly
+- We can also use other names
+- Java equivalent: 
+    + pass strings/integers = by value
+    + pass objects = by reference
+
+## Ethics
+Soundex is a phonetic algorithm used to identify and group words that sound the same.
+
+- Phonetic algorithms help us identify words
+- representational accuracy vs. ease of analysis
+- easy to implement + clear rules of grouping words together
+- people's names incorrectly grouped together -> lack of representation. 
+- consequences:
+  + distributive harms (goods / outcomes)
+  + equality of opportunity vs. outcome vs. welfare
+  + representational harm: American Standard Code for Info Interchange (256 char) vs. Unicode (1e6 char)

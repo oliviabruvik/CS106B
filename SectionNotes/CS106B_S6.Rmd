@@ -1,0 +1,75 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Section 5: Classes and Dynamic Memory"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 5: Classes and Dynamic Memory {.tabset}
+
+## Material
+<https://web.stanford.edu/class/cs106b/section/section5/>
+
+- classes
+- objects
+- dynamic memory
+
+## Q1: Circle of Life (Circle.h/.cpp) {.tabset}
+Topic: Classes
+
+### Problem 
+Write a class named Circle that stores information about a circle. Your class must implement the following public interface:
+
+```{Rcpp, eval = FALSE}
+class Circle {
+	// constructs a new circle with the given radius
+	Circle(double r); 
+	// returns the area occupied by the circle
+	double area() const;
+	// returns the distance around the circle 
+	double circumference() const;
+
+	// returns the radius as a real number
+	double getRadius() const;
+	// returns a string representation such as "Circle{radius=2.5}"
+	string toString() const;
+};
+```
+
+You are free to add any private member variables or methods that you think are necessary. It might help you to know that there is a global constant PI storing the approximate value of π, roughly 3.14159.
+
+### Solution
+
+
+```{Rcpp, eval = FALSE}
+// Circle.cpp
+
+Circle::Circle(double rad) {
+    radius = rad;
+}
+
+double Circle::area() const {
+    double area = PI * getRadius() * getRadius();
+    return area;
+}
+
+double Circle::circumference() const {
+    double circumference = 2 * PI * radius;
+    return circumference;
+}
+
+double Circle::getRadius() const{
+    return radius;
+}
+
+string Circle::toString() const{
+    return "Circle{radius=" + realToString(radius) + "}";
+}
+
+```
+

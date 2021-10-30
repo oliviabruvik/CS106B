@@ -1,0 +1,61 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 7: Recursion"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 7 {.tabset}
+
+## Topics
+Recursion
+
+- Functions calling functions
+- Technique for tackling large or complicated problems and breaking it into smaller pieces.
+
+## Recursive function pattern
+### Always two parts:
+1. Base case: return trivial solution to problem
+2. Recursive case: nested function call
+
+### Example: Factorial
+What is 3rd thing printed when calling factorial(4)? 2
+
+```{Rcpp, eval = FALSE}
+int factorial(int n) {
+  cout << n << endl;              
+  if (n == 1) {                   // base case
+    return 1;
+  } else {                        // recursive case
+    return n * factorial(n - 1);
+  }
+}
+```
+
+## Computer memory
+##### Memory
+Vector/array of 1-byte slots starting at index 0.
+
+##### Regions
+1. Stack: stores local variables for each function
+    + function call = push a stack frame
+    + function return = pop a stack frame
+2. Heap
+3. Text: the program's own code
+  
+##### Stack overflow
+Term describing when an excess of function calls leads the stack to reach the heap.
+
+## Efficiency
+##### Measured using Big-O notation.
+`Rcpp vector.insert(index, x)` = O(N) <br>
+`Rcpp vector.add(x)` = O(1)
+
+##### Efficiency as virtue?
+- Efficient algorithms may come up with wrong/problematic answers with significant social impact
+- Balance cost (efficiency) with correctness and justice for society?

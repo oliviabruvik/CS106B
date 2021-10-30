@@ -1,0 +1,561 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Section 1: C++ fundamentals"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 1 {.tabset}
+
+## Material
+<https://web.stanford.edu/class/cs106b/section/section1/>
+
+- functions,
+- parameters,
+- return,
+- decomposition,
+- strings
+- basic data structures
+
+## Problem 1: Returning and Printing {.tabset}
+
+### Problem
+
+Below is a series of four *printLyrics_v#* functions, each of which has a blank where the return type should be. For each function, determine
+
+1. what the return type of the function should be,
+2. what value, if any, is returned, and
+3. what output, if any, will be produced if that function is called.
+
+Is it appropriate for each of these functions to be named printLyrics? Why or why not?
+
+```{Rcpp, eval = FALSE}
+
+#include <Rcpp.h>
+using namespace Rcpp;
+
+_____ printLyrics_v1() {
+    cout << "Havana ooh na na" << endl;
+}
+_____ printLyrics_v2() {
+    return "Havana ooh na na";
+}
+_____ printLyrics_v3() {
+    return "H";
+}
+_____ printLyrics_v4() {
+    return 'H';
+}
+
+```
+
+
+### Solution
+
+```{Rcpp, eval = FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+void printLyrics_v1() {
+    cout << "Havana ooh na na" << endl;
+}
+string printLyrics_v2() {
+    return "Havana ooh na na";
+}
+string printLyrics_v3() {
+    return "H";
+}
+char printLyrics_v4() {
+    return 'H';
+}
+
+```
+
+## Q2: References Available Upon Request {.tabset}
+
+### Problem
+
+Topic: Reference parameters, range-based for loops
+<br>
+
+Reference parameters are an important part of C++ programming, but can take some getting used to if you’re not familiar with them. Trace through the following code. What does it print?
+
+```{Rcpp, eval = FALSE}
+void printVector(const Vector<int>& values) {
+    for (int elem: values) {
+        cout << elem << " ";
+    }
+    cout << endl;
+}
+
+void maui(Vector<int> values) {
+    for (int i = 0; i < values.size(); i++) {
+        values[i] = 1258 * values[i] * (values[2] - values[0]);
+    }
+}
+
+void moana(Vector<int>& values) {
+    for (int elem: values) {
+        elem *= 137;
+    }
+}
+
+void heihei(Vector<int>& values) {
+    for (int& elem: values) {
+        elem++;
+    }
+}
+
+Vector<int> teFiti(const Vector<int>& values) {
+    Vector<int> result;
+    for (int elem: values) {
+        result += (elem * 137);
+    }
+    return result;
+}
+
+int main() {
+    Vector<int> values = { 1, 3, 7 };
+    maui(values);
+    printVector(values);
+    moana(values);
+    printVector(values);
+    heihei(values);
+    printVector(values);
+    teFiti(values);
+    printVector(values);
+    return 0;
+}
+```
+
+### Solution
+```{Rcpp, eval = FALSE}
+
+int main() {
+    Vector<int> values = { 1, 3, 7 };
+    maui(values);
+    printVector(values); // { 1, 3, 7}
+    moana(values);
+    printVector(values); // { 1, 3, 7 }
+    heihei(values);
+    printVector(values); // { 2, 4, 8}
+    teFiti(values);
+    printVector(values); // { 2, 4, 8}
+    return 0;
+}
+```
+
+## Q3: SumNumbers (sum.cpp) {.tabset}
+### Problem 
+Topics: Vectors, strings, file reading <br>
+
+The function sumNumbers reads a text file and sums the numbers found within the text. Here are some library functions that will be useful for this task:
+
+- readEntireFile, to read all lines from a file stream into a Vector
+- stringSplit, to divide a string into tokens
+- isdigit, to determine whether char is a digit
+- stringToInteger, to convert a string of digits to integer value
+
+In particular you will be asked to write the following function:
+
+`int sumNumbers(string filename)`
+
+When given the following file, named numbers.txt, as input, your function should return 42.
+
+`42 is the Answer to the Ultimate Question of Life, the Universe, and Everything` <br>
+`This is a negative number: -9` <br>
+`Welcome to CS106B!` <br>
+`I want to own 9 cats.`
+
+### Solution
+```{Rcpp, eval = FALSE}
+
+bool isNumber(string word) {
+    for (char letter : word) {
+        if (!isdigit(letter) && letter != '-') {
+            return false;
+        }
+    }
+    return true;
+}
+
+int sumNumbers(string filename) {
+    Vector<string> lines;
+    Vector<string> words;
+    int sum = 0;
+
+    ifstream in;
+    if (!openFile(in, filename)) {
+        return 0;
+    }
+
+    readEntireFile(in, lines);
+
+    for (string& line : lines) {
+        Vector<string> words = stringSplit(line, " ");
+        for (string& word : words) {
+            if (isNumber(word)) {
+                sum += stringToInteger(word);
+            }
+        }
+    }
+    return sum;
+}
+
+```
+
+### Posted solution
+
+```{Rcpp, eval = FALSE}
+
+bool isNumber(string s)
+{
+    // strip negative sign off negative numbers
+    if (s.length() > 0 && s[0] == '-'){
+        s = s.substr(1);
+    }
+    for (char ch : s)
+        if (!isdigit(ch)) return false;
+    return s.length() > 0;
+}
+
+int sumNumbers(string filepath)
+{
+    ifstream in;
+    Vector<string> lines;
+    int sum = 0;
+
+    if (!openFile(in, filepath))
+        return 0;
+
+    readEntireFile(in, lines);
+    for (string line : lines) {
+        Vector<string> tokens = stringSplit(line, " ");
+        for (string t : tokens) {
+            if (isNumber(t)) {
+                sum += stringToInteger(t);
+            }
+        }
+    }
+    return sum;
+}
+
+
+```
+
+
+## Q4: Debugging deduplication {.tabset}
+
+### Buggy implementation
+```{Rcpp, eval = FALSE}
+void deduplicate(Vector<string> vec) {
+    for (int i = 0; i < vec.size(); i++) {
+        if (vec[i] == vec[i + 1]) { 
+            vec.remove(i);
+        }
+    }
+}
+```
+
+### Fixed implementations
+```{Rcpp, eval = FALSE}
+void deduplicate(Vector<string> vec) {
+    for (int i = 0; i < vec.size(); i++) {
+        if (vec[i] == vec[i + 1]) { 
+            vec.remove(i);
+        }
+    }
+}
+```
+
+```{Rcpp, eval = FALSE}
+void deduplicate(Vector<string>& vec) {
+    for (int i = vec.size() - 1; i > 0; i--) {
+        if (vec[i] == vec[i - 1]) {
+            vec.remove(i);
+        }
+    }
+}
+```
+
+## Q5: Pig-Latin {.tabset}
+
+### Problem
+Topics: Strings, reference parameters, return types <br> 
+
+Write two functions, pigLatinReturn and pigLatinReference, that accept a string and convert said string into its pig-Latin form. To convert a string into pig-Latin, you must follow these steps:
+
+1. Split the input string into 2 strings: a string of characters BEFORE the first vowel, and a string of characters AFTER (and including) the first vowel.
+2. Append the first string (letters before the first vowel) to the second string.
+3. Append the string "ay" to the resulting string.
+
+Here are a few examples…
+
+1. nick -> icknay
+2. chase -> asechay
+3. chris -> ischray
+
+You will need to write this routine in two ways: once as a function that returns the pig-Latin string to the caller, and once as a function that modifies the supplied parameter string and uses it to store the resulting pig-Latin string. These will be done in pigLatinReturn and pigLatinReference, respectively. You may assume that your input is always a one-word, all lowercase string with at least one vowel. <br>
+
+Here's a code example of how these functions differ… <br>
+
+```{Rcpp, eval = FALSE}
+string name = "julie";
+string str1 = pigLatinReturn(name);
+cout << str1 << endl; // prints "uliejay"
+
+pigLatinReference(name);
+cout << name << endl; // prints "uliejay"
+```
+
+### Solution
+
+```{Rcpp, eval = FALSE}
+
+bool isvowel(char ch) {
+    return (ch == 'a') ||
+            (ch == 'e') ||
+            (ch == 'i') ||
+            (ch == 'o') ||
+            (ch == 'u') ||
+            (ch == 'y');
+}
+
+int returnFirstVowel(string input) {
+    for (int i = 0; i <= input.length() - 1; i++) {
+        if (isvowel(input[i])) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+string pigLatinReturn(string input) {
+    (void) input;
+    int firstVowel = returnFirstVowel(input);
+    if (firstVowel >= 0) {
+        string part1 = input.substr(0, firstVowel);
+        string part2 = input.substr(firstVowel);
+        return part2 + part1 + "ay";
+    } else {
+        return input;
+    }
+}
+
+void pigLatinReference(string &input) {
+    (void) input;
+    int firstVowel = returnFirstVowel(input);
+    if (firstVowel >= 0) {
+        string part1 = input.substr(0, firstVowel);
+        string part2 = input.substr(firstVowel);
+        input = part2 + part1 + "ay";
+    }
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+
+// Use const because VOWELS won't change -- no need to declare repeatedly
+// in isVowel.
+const string VOWELS = "aeiouy";
+
+// Helper function, which I'd highly recommend writing!
+bool isVowel(char ch){
+    // A little kludgy, but the handout guarantees that
+    // ch will ALWAYS be lower case :)
+    // NOTE: For an assignment, you probably want a more robust isVowel.
+    return VOWELS.find(ch) != string::npos;
+}
+
+string pigLatinReturn(string input){
+    int strOneIndex = 0;
+    for (int i = 0; i < input.length(); i++){
+        if (isVowel(input[i])){
+            strOneIndex = i;
+            break;
+        }
+    }
+    string strOne = input.substr(0, strOneIndex);
+    string strTwo = input.substr(strOneIndex);
+    return strTwo + strOne + "ay";
+}
+
+void pigLatinReference(string &input){
+    int strOneIndex = 0;
+    for (int i = 0; i < input.length(); i++){
+        if (isVowel(input[i])){
+            strOneIndex = i;
+            break;
+        }
+    }
+    string strOne = input.substr(0, strOneIndex);
+    string strTwo = input.substr(strOneIndex);
+    input = strTwo + strOne + "ay";
+}
+
+```
+
+## Q6: Mirror {.tabset}
+Topic: Grids
+
+### Problem
+Topic: Grids <br>
+
+Write a function ​mirror​ that accepts a reference to a ​Grid​ of integers as a parameter and flips the grid along its diagonal. You may assume the grid is square; in other words, that it has the same number of rows as columns. For example, the grid below that comes first would be altered to give it the new grid state shown afterwards:
+
+Original state: <br> 
+`{ { 6, 1, 9, 4},`               
+`  {-2, 5, 8, 12},  `                
+`  {14, 39, -6, 18}, `            
+`  {21, 55, 73, -3} }`              
+
+Mirrored state: <br>
+` { {6, -2, 14, 21}, ` <br>
+`   {1, 5, 39, 55}, ` <br>
+`   {9, 8, -6, 73}, ` <br>
+`   {4, 12, 18, -3} } `
+
+### Solution
+```{Rcpp, eval = FALSE}
+void mirror(Grid<int> &nums){
+    for (int i = 0; i < nums.numRows(); i++) {
+        for (int j = i + 1; j < nums.numCols(); j++) {
+            int oldValue = nums[i][j];
+            int newValue = nums[j][i];
+            nums[i][j] = newValue;
+            nums[j][i] = oldValue;
+        }
+    }
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+void mirror(Grid<int>& grid) {
+    for (int r = 0;r < grid.numRows(); r++) {
+        // start at r+1 rather than 0 to avoid double-swapping 
+        for (int c = r + 1; c < grid.numCols(); c++) { 
+            int temp = grid[r][c]; 
+            grid[r][c] = grid[c][r]; 
+            grid[c][r] = temp;
+        } 
+    }
+}
+```
+
+## Q7: Check balance {.tabset}
+Topic: Stacks
+
+### Problem
+Write a function named checkBalance that accepts a string of source code and uses a Stack to check whether the braces/parentheses are balanced. Every ( or { must be closed by a } or ) in the opposite order. Return the index at which an imbalance occurs, or -1 if the string is balanced. If any ( or { are never closed, return the string's length. <br>
+
+Here are some example calls:
+
+```{Rcpp, eval = FALSE}
+//   index    0123456789012345678901234567
+checkBalance("if (a(4) > 9) { foo(a(2)); }") 
+// returns -1 (balanced)
+
+//   index    01234567890123456789012345678901
+checkBalance("for (i=0;i<a;(3};i++) { foo{); )")
+// returns 15 because } is out of order
+
+//   index    0123456789012345678901234
+checkBalance("while (true) foo(); }{ ()")
+// returns 20 because } doesn't match any {
+
+//   index    01234567
+checkBalance("if (x) {")
+// returns 8 because { is never closed
+
+```
+
+### Solution
+```{Rcpp, eval = FALSE}
+int checkBalance(string code) {
+    Stack<char> brackets;
+    for (int i = 0; i < code.length(); i++) {
+        char ch = code[i];
+        if (stringContains("(){}", ch)) {
+            if (ch == '(' || ch == '{') {
+                brackets.push(ch);
+            } else {
+                if (brackets.isEmpty()) return i;
+                char top = brackets.pop();
+                if ((top == '(' && ch != ')') || (top == '{' && ch != '}' )) {
+                    return i;
+                }
+            }
+        }
+    }
+    return brackets.size() == 0 ? -1 : code.length();
+}
+```
+
+### Posted solution
+```{Rcpp, eval = FALSE}
+int checkBalance(string code) {
+    Stack<char> parens;
+    for (int i = 0; i < (int) code.length(); i++) {
+        char c = code[i];
+        if (c == '(' || c == '{') {
+        parens.push(c);
+        } else if (c == ')' || c == '}') {
+            if (parens.isEmpty()) {
+                return i;
+            }
+            char top = parens.pop();
+            if ((top == '(' && c != ')') || (top == '{' && c != '}')) {
+                return i;
+            }
+        }
+    }
+
+    if (parens.isEmpty()) {
+        return -1; // balanced
+    } else {
+        return code.length();
+    }
+}
+```
+
+## 8) Collection Mystery {.tabset}
+Topics: Stacks and Queues
+
+### Problem
+```{Rcpp, eval = FALSE}
+void collectionMystery(Stack<int>& s) 
+{ 
+    Queue<int> q;
+    Stack<int> s2;
+
+    while (!s.isEmpty()) {
+       if (s.peek() % 2 == 0) {
+            q.enqueue(s.pop()); 
+        } else {
+            s2.push(s.pop());
+        }
+    }
+    while (!q.isEmpty()) {
+        s.push(q.dequeue()); 
+    }
+    while(!s2.isEmpty()) { 
+        s.push(s2.pop());
+    }
+    cout<< s << endl;
+}
+```
+
+Write the output produced by the above function when passed each of the following stacks. Note that stacks and queues are written in ​front to back order, with the oldest element on the left side of the queue/stack.
+
+### Solution
+Stacks: <br>
+`{1, 2, 3, 4, 5, 6}                     {6, 4, 2, 1, 3, 5}` <br>
+`{42, 3, 12, 15, 9, 71, 88}             {88, 12, 42, 3, 15, 9, 71}` <br>
+`{65, 30, 10, 20, 45, 55, 6, 1}         {6, 20, 10, 30, 65, 45, 55, 1}`
