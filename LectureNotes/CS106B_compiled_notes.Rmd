@@ -10,6 +10,9 @@ output: html_document
 options(knitr.duplicate.label='allow')
 ```
 
+```{r child = "CS106B_L14.Rmd"}
+```
+
 ```{r child = "CS106B_L13.Rmd"}
 ```
 
@@ -22,15 +25,19 @@ options(knitr.duplicate.label='allow')
 ```{r child = "CS106B_L7.Rmd"}
 ```
 
+```{r child = "CS106B_L6.Rmd"}
+```
+
 ```{r child = "CS106B_L4.Rmd"}
 ```
 
 ```{r child = "CS106B_L3.Rmd"}
 ```
 
+```{r child = "CS106B_L2.Rmd"}
+```
+
 ```{r child = "CS106B_L1.Rmd"}
 ```
 
-<!-- # ```{r child = "CS106B_notes.Rmd"} -->
-<!-- # ``` -->
 
