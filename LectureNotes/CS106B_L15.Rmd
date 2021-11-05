@@ -1,0 +1,192 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 15: Object-Oriented Programming"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 15 {.tabset}
+
+## Topics
+- Classes
+- Objects
+- Abstraction
+- Constructors
+- Destructors
+
+## Classes and objects
+- Class: allow us to add new types to the language `vector.h`
+  + template for what the type holds and how it works
+  + elements of a class includes member variables (state inside objects) and member functions (behavior of objects)
+- Object: one instance of a class type `Vector<int> a;`
+- Object-oriented programming: programs that perform their behavior as interactions between objects
+- Abstraction: separation between concepts and details
+
+## Header files (.h)
+- contains the interface (declarations)
+- content #included inside .cpp files
+
+```{Rcpp, eval = FALSE}
+#ifndef _classname_h
+#define _classname_h
+
+class ClassName {
+public:                          // in ClassName.h
+  ClassName(parameters);       // constructor
+
+  returnType name(parameters); // member functions
+  returnType name(parameters); // (behavior inside
+  returnType name(parameters); //  each object)
+
+private:
+  type _name; // member variables
+  type _name;     // (data inside each object)
+};
+
+#endif // must include semicolon at end of class declaration!
+```
+
+```{Rcpp, eval = FALSE}
+// BankAccount.h
+
+#ifndef _bankaccount_h
+#define _bankaccount_h
+
+class BankAccount {             
+public:
+  BankAccount(string n, double d);  // constructors
+  BankAccount(string n);             
+
+  void deposit(double amount);      // methods
+  void withdraw(double amount);
+
+private:
+  string _name;      // each BankAccount object
+  double _balance;   // has a name and balance
+};
+
+#endif
+```
+
+
+## Source files (.cpp)
+Contains definitions (method bodies)
+
+### Using objects
+Objects group multiple variables together:
+- Each object contains fields in constructor, given as parameters
+- We can get/set fields individually
+- Client code: code that uses your objects
+
+```{Rcpp, eval = FALSE}
+BankAccount ba1("Cynthia", 1.25); // _name = "Cynthia"
+ba1.deposit(2.00);                // _balance = 3.25
+```
+
+### Member function bodies
+Bodies for the member functions declared in the header file. <br>
+Can refer to the object's member variables. 
+```{Rcpp, eval = FALSE}
+#include "ClassName.h"
+
+// member function
+returnType ClassName::methodName(parameters) {
+  statements;
+  statements;
+}
+```
+
+## Constructors
+Initialize state of new objects as they are created
+- no return type specified - returns new object
+- always include constructor, i.e. `BankAccount ba("Cynthia", 1.25)'`
+
+```{Rcpp, eval = FALSE}
+ClassName::ClassName(parameters) {
+  statements to initialize the object;
+}
+```
+
+## Private data
+```{Rcpp, eval = FALSE}
+private:
+  type name;
+```
+
+Methods to get and/or set a data field's value:
+```{Rcpp, eval = FALSE}
+
+// "read-only" access to the balance ("accessor")
+double BankAccount::getBalance() {
+  return _balance;
+}
+
+// Allows clients to change the field ("mutator")
+void BankAccount::setName(string newName) {
+  _name = newName;
+}
+```
+
+`class Foo`: must write both foo.h and foo.cpp
+
+## Preconditions
+Something your code assumes is true at the start of its execution
+- often documented as comment on the function's header
+- if violated, class throws an exception
+
+```{Rcpp, eval = FALSE}
+// Initializes a BankAccount with the given state.
+// Precondition: balance is non-negative
+BankAccount::BankAccount(string name, double balance) {
+  if (balance < 0) {
+    throw balance;
+  }
+  _name = name;
+  _balance = balance;
+}
+```
+
+## Printable objects
+Overload << to print your object to cout:
+
+```{Rcpp, eval = FALSE}
+ostream& operator <<(ostream& out, Type& name) {
+  statements;
+  return out;
+}
+```
+
+
+<< overload example
+```{Rcpp, eval = FALSE}
+// BankAccount.h
+class BankAccount {
+  ...
+};
+
+// notice operators go OUTSIDE of the class' closing }; brace! 
+ostream& operator <<(ostream& out, BankAccount& ba);
+
+
+// BankAccount.cpp
+ostream& operator <<(ostream& out, BankAccount& ba) {
+  out << ba.getName() << ": $" << ba.getBalance();
+  return out;
+}
+```
+
+## Destructor
+- Called when the object is deleted by the program (falls out of the {} scope)
+- Usef
+```{Rcpp, eval = FALSE}
+// ClassName.h
+~ClassName();
+
+// ClassName.cpp
+ClassName::~ClassName() { ...
+```

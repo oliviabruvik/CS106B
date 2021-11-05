@@ -1,0 +1,131 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 16: Classes"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 16: Classes {.tabset}
+
+## Topics
+- Classes
+
+## Arrays
+Inside a stack / queue / vector is an array storing the elements you have added (array size > n of elements). 
+
+### Statistically allocated (stack-allocated) array:
+- can never be resized.
+- memory does not need to be freed.
+- `type name[length];`
+
+### Dynamically allocated (AKA heap-allocated) array
+- The variable that refers to the array is called a pointer
+- memory allocated for array must be manually released, or else the program will have a memory leak.
+- `type* name = new type[length];` and `delete [] heapArr;`
+
+## Danger in C/C++: uninitialized memory
+
+### Unnitialized memory
+The elements store garbage values: `type* name = new type[length];`
+
+```{Rcpp, eval = FALSE}
+int* a = new int[3];
+cout << a[0]; // 2395876
+cout << a[1]; // -1919283
+```
+
+### Initialized memory
+Elements are initialized with zeroes: `type* name = new type[length]();`
+
+```{Rcpp, eval = FALSE}
+int* a2 = new int[3]();
+cout << a[0]; // 0
+cout << a[1]; // 0
+```
+
+Slower but good if needed.
+
+## Implementing arrayStack {.tabset}
+
+### arraystack.h
+
+```{Rcpp, eval = FALSE}
+#ifndef _arraystack_h
+#define _arraystack_h
+
+#include <iostream>
+using namespace std;
+
+class ArrayStack {
+public:
+  ArrayStack();
+  int pop();
+  int peek();
+  bool isEmpty();
+  friend ostream& operator <<(ostream& out, ArrayStack& stack);
+
+private:
+  int* _elements;
+  int _size;
+  int _capacity;
+  
+  void enlargeArray();
+};
+
+#endif
+
+```
+
+### arraystack.cpp
+```{Rcpp, eval = FALSE}
+ArrayStack::~ArrayStack() {
+  
+}
+
+bool ArrayStack::isEmpty() {
+  return _size == 0;
+}
+
+void ArrayStack::push(int value) {
+  if (_size == _capacity) {
+    enlargeArray();
+  }
+  
+  _elements[_size] = value;
+  _size++;
+}
+
+int ArrayStack::pop() {
+  int value = peek();
+  _size--;
+  return value;
+}
+
+int ArrayStack::peek() {
+  if (isEmpty()) {
+    throw "empty stack!";
+  } else {
+    return _elements[_size - 1];
+  }
+}
+
+void ArrayStack::enlargeArray() {
+  int* newElements = new int[2 * _capacity];
+  for (int i = 0; i < _size; i++) {
+    newElements[i] = _elements[i];
+  }
+  
+  delete [] _elements;
+  
+  _elements = newElements;
+  _capacity *= 2;
+}
+
+// ostream& operator <<(ostream& out, ArrayStack& stack) {
+// }
+

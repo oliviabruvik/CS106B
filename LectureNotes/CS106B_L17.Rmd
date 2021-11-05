@@ -1,0 +1,76 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 17: Memory and Pointers"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 17: Pointers and Structs {.tabset}
+
+## Topics
+- Implementing class
+  + arrays in C++
+  + new/delete dynamic memory allocation
+  + uninitialized memory
+- C/C++ struct feature
+- pointer
+
+## Memory addresses
+- Whenever you declare a variable, you allocate a bucket (or more) of memory for the value of that variable
+- Each bucket of memory has a unique address
+- You can ask any variable's address using the & operator (not pass by reference).
+- typically written in hexadecimal
+`cout 
+`int ptrC = &candies;`
+
+## Pointer
+- Type depends on what it points to, i.e.:
+  + `int* p;`
+  + `bool* q;`
+  
+## Dynamically-allocated object
+
+```{Rcpp, eval = FALSE}
+Queue<GridLocation>* path = new Queue<GridLocation>();
+path->enqueue({0,0}); // instead of path.enqueue() when pointer
+delete path;
+```
+
+## Structs
+### General idea
+- Collection of some variables together into a new type
+- Holdover from C
+- You can declare a variable and access fields with period: `Album.title`
+
+```{Rcpp, eval = FALSE}
+struct Album {
+  string title;
+  int year;
+  
+  string artist_name;
+  int artist_age;
+};
+```
+
+### Redundant use of struct:
+```{Rcpp, eval = FALSE}
+void foo() {
+  Album lemonade = {"Lemonade", 2016, "Beyonce", 38}
+  Album lemonade = {"B'Day", 2016, "Beyonce", 38}
+}
+```
+
+### Structs within structs
+Struct copies don't update universally. 
+
+### Struct with pointer
+`Artist* beyonce = new Artist` <br>
+`beyonce->name = "Beyonce";` <br>
+`delete beyonce;` <br>
+
+
