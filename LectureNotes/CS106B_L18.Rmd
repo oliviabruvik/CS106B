@@ -1,0 +1,27 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 18: Priority Queue"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 18: Priority Queue {.tabset}
+
+## Topics
+- Implementing class
+  + arrays in C++
+  + new/delete dynamic memory allocation
+  + uninitialized memory
+- C/C++ struct feature
+- pointer
+
+## Contents of one element of a priority queue
+
+Individual elements of our priority queue will have two pieces to them:
+
+1) Integer indicating the 
