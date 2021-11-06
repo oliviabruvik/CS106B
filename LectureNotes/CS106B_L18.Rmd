@@ -24,4 +24,52 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Individual elements of our priority queue will have two pieces to them:
 
-1) Integer indicating the 
+1) Integer indicating the priority (smaller number = higher priority)
+2) A "payload" of whatever the actual element data is, i.e. a class or a string
+
+## Implementation options
+
+1) Unsorted array
+    + insert new element in back: `O(1)`
+    + remove/peek by search list and scooting over: `O(N)`
+2) Sorted array
+    + always insert in sorted order: `O(N)`
+    + remove from back: `O(1)`
+
+## Binary heap
+One kind of binary tree:
+
+- a tree data structure in which each node has at most two child nodes (left/right).
+- partially-sorted priority queue nodes.
+- top child: root node
+
+##### Restrictions
+- Must be complete 
+    + no gaps - nodes are filled in left-to-right on each level (row) of the tree
+    + makes binary heaps fit nicely into an array (not true )
+- Ordering of data must obey heap property
+    + min-heap version: parent's priority always $\leq$ both its children's priority
+    + max-heap version: parent's priority always $\geq$ both its children's priority
+
+## Binary heap in an array
+Parent of node in array index i is found at $(i-1)/2$. Use integer division and round 
+
+- Enqueue: insert + "bubble up"  `O(logN)`
+- Dequeue: delete + "trickle down" `O(logN)`
+
+##### 0-based:
+For a tree of height h, array length is $2^{h}-1$
+For a node in array index i:
+
+- Parent is at array index: $(i-1)/2$
+- Left child is at array index: $2i+1$
+- Right child is at array index: $2i+2$
+
+##### 1-based:
+For a tree of height h, array length is $2^{h}$
+For a node in array index i:
+
+- Parent is at array index: $i/2$
+- Left child is at array index: $2i$
+- Right child is at array index: $2i+1$
+
