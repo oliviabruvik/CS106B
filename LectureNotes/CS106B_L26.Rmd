@@ -1,0 +1,45 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 26: Graphs"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 26: Graphs {.tabset}
+
+## Topics
+
+## Graphs
+- A set V of vertices (or nodes) - associated label
+- A set E of edges (or arcs) connecting a pair of vertices - associated cost/weight
+- Directed graph: an edge from A to B only allows you to go from A to B
+- Undirected graph: an edge between A and B allows travel in both directions.
+
+## Paths
+- *path*: a path from vertex a to b is a sequence of edges that can be followed starting from a to reach b. 
+- *neighbor / adjacent*: two vertices connected directly by an edge.
+- *reachable*: vertex a is reachable from b if a path exists from a to b.
+- *connected*: a graph is connected if every vertex is reachable from every other
+- *cycle*: a path that begins and ends at the same node
+
+## Representing graphs
+
+### Adjacency matrix
+Good for use when the proportion of vertices to edges is low. <br>
+From: vertical <br>
+To: horizontal
+
+Represent graph as a
+
+1) `Grid<bool>` (unweighted)
+2) `Grid<int>` (weighted)
+
+### Adjacency list
+`Map<Node*, Set<Node*>>`: represent a graph as a map from nodes to the set of nodes each node is connected to. <br>
+
+`Map<Node*, Set<Edge*>>`: use struct to represent weighted graph.

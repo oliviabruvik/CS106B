@@ -1,0 +1,150 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 22: More Linked Lists"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 22: More Linked Lists {.tabset}
+
+## Topics
+- LinkedList Applications, Algorithms, Variants:
+    + using a linked list for a queue
+    + tail pointers
+    + the undo-enqueue operation
+    + doubly-linked lists
+
+## LinkedList class
+- Has the same public members as ArrayList, Vector, etc.
+- List is internally implemented as a chain of linked nodes
+    + keeps a pointer to its front node
+    + nullptr is the end of the list
+  
+```{Rcpp, eval = FALSE}
+class LinkedList {
+public:
+  LinkedList();
+  ~LinkedList();
+  void add(int value);
+  void clear();
+  int get(int index) const;
+  void insert(int index, int value);
+  bool isEmpty() const;
+  void remove(int index);
+  void set(int index, int value);
+  int size() const;
+
+private:
+  ListNode* _front;
+  int _size;
+}
+```
+
+  
+```{Rcpp, eval = FALSE}
+class Queue {
+public:
+  Queue();
+  ~Queue();
+  void enqueue(int value);
+  void clear();
+  int dequeue(int index) const;
+  int peek(int index, int value);
+  bool isEmpty() const;
+  int size() const;
+  void undoEnqueue();
+
+private:
+  ListNode* _front;
+  int _size;
+}
+```
+
+#### Dequeue
+- O(1)
+- Front of queue: front of list
+
+#### Enqueue
+- O(N)
+- Back of queue: back of list
+
+#### Tail pointer
+- Third private member variable to our LinkedList class
+- facilitates:
+    + _front enables dequeue in `O(1)`
+    + _tail enables enqueue in `O(1)`
+- _size stays the same
+- _tail will be:
+    + nullptr if list is empty
+    + front if _size == 1
+
+## Implementing enqueue
+```{Rcpp, eval = FALSE}
+void Queue::enqueue(int value) {
+  if (_front == nullptr) {
+    _front = newListNode(value);
+    _tail = _front;
+  } else {
+    _tail->_next = new ListNode(value);
+    _tail = _tail->next;
+  }
+  _size++;
+}
+```
+
+## Doubly LinkedList
+
+- Benefits
+    + Easy access to nodes before your node
+- Drawbacks
+    + Linked list already doubles amount of storage needed to hold our data (compared to array); doubly-linked list triples it.
+    + More work in every add, remove, etc operation to maintain correct pointer placements
+
+```{Rcpp, eval = FALSE}
+class Queue {
+public:
+  Queue();
+  ~Queue();
+  void enqueue(int value);
+  void clear();
+  int dequeue(int index) const;
+  int peek(int index, int value);
+  bool isEmpty() const;
+  int size() const;
+  void undoEnqueue();
+
+private:
+  ListNode* _front;
+  ListNode* _tail;
+  ListNode* _tail;
+  int _size;
+}
+```
+
+#### NB! We cannot do binary search on a linked list to implement a quick insert:
+We cannot jump right to the middle, but must follow nodes that are spread all over memory. 
+Binary search in array: O(logN)
+Binary search in linked list: O(N)
+
+## Implementing an undo-enqueue operation
+
+```{Rcpp, eval = FALSE}
+void Queue::undoEnqueue() {
+  if (size() == 0) {
+    error("Cannot remove from empty queue!");
+  DoubleLinkNode* trash = _tail;
+  if (size() == 1) {
+    _tail = _front = nullptr;
+  } else {
+    _tail->prev->next = nullptr; // relies on size >= 2
+    _tail = _tail->prev;
+  }
+  _size--;
+  delete trash;
+}
+```

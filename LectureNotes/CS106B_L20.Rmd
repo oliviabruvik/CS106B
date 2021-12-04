@@ -1,0 +1,79 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 20: Pointers and memory"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 20: Memory and pointers {.tabset}
+
+## Topics
+- Pointers
+- Dereference operators
+- Linked lists
+
+
+## Pointers and dereference operators
+
+Pointers
+
+- Special type of variable that holds a memory address
+- Declared by writing `(type of data it points at)*`.
+
+`&` to access memory address, i.e. `int* ptrC = &candies;` <br>
+`*variable_name` to dereference a pointer. <br>
+`->` to access a field of the struct at once with the struct dereference operator. <br>
+
+## Null Pointer
+Pointer that doesn't point to any valid memory address. Type "blank" to show "waiting" state.
+
+```{Rcpp, eval = FALSE}
+int* myptr = nullptr;
+
+if (test) {
+  myptr = new int[3];
+}
+
+if (myptr == nullptr) {
+  cout << "haven't assigned a value to myptr yet" << endl;
+}
+```
+
+## Array performance
+### Limitations of the array
+Insertion - O(n) <br>
+Deletion - O(n) <br> 
+Lookup (given index/memory address) - O(1) <br>
+
+## Linked lists
+- A list of linked nodes composed of interchangeable nodes.
+- Each element is:
+    + stored separately from others,     + chained together to form a one-way sequence using pointers. 
+
+### Linked node struct
+```{Rcpp, eval = FALSE}
+struct LinkNode{
+  int data;       // data being stored
+  LinkNode* next; // pointer to the next node struct in the sequence (nullptr at end)
+}
+
+LinkNode* node1 = new LinkNode;
+node1->data = 75;
+node1->next = nullptr;
+LinkNode* node = new LinkNode;
+node-> data = 10;
+node->next = node1; // node points same direction as node1
+```
+
+### Linked list
+```{Rcpp, eval = FALSE}
+front->next->next = new LinkNode;
+front->next->next->data = 40;
+front->next->next->next = nullptr;
+```
+

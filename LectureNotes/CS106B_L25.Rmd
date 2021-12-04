@@ -1,0 +1,52 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 25: Huffman Trees"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 25: Huffman Trees {.tabset}
+
+## Topics
+
+## Encoding Huffman trees
+1. Compression algorithm
+2. Provably optimal
+3. Involves binary tree data structures
+4. Way of choosing which characters are encoded which ways, customized to the specific file you are using
+
+## Encoding
+Computer stores information as binary (base 2) numbers: `5 = 101` <br>
+Each "box" store a bit, a number of binary digits, ie. 110011100 <br>
+Encodings are what tell us how to translate binary numbers to other formats (JPEG).
+
+## ASCII
+- Old-school encoding for characters
+- char type in C++
+- Each symbol is encoded as 8 binary digits (8 bits)
+- There are 256 unique sequences of 8 bits, so numbers 0-255 each correspond to one character
+
+## Huffman encoding
+- Encodings are always stored in the leaf nodes of binary search trees.
+- Traverse tree (pre-order / in-order / post-order)
+
+Making tree:
+
+1. Read your file and count how many times each character occurs
+2. In a priority queue, store a collection of tree nodes, each having
+    a) a key = # of occurrences, and
+    b) a value = the character
+    c) highest priority = lowest # of occurences
+3. Dequeue two nodes and make them the two children of a new node with no character and # of occureces is the sum
+4. Enqueue this new node
+5. Repeat until PQ.size() == 1
+6. Assign codes by interpreting the tree as:
+    a) left child = 0
+    b) right child = 1
+
+We don't need delimeters because of prefix property. 

@@ -1,0 +1,116 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 27: Hashing"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 27: Hashing {.tabset}
+
+## Topics
+
+## Hash functions
+### Properties
+- Use: assign elements to a bucket.
+- Deterministic: the same input should produce the same output.
+- Output called a hash code
+    + `Input: 12`
+    + `Hash code: 106107`
+
+### Goal
+- Distributed elements evenly ("spread")
+- Maintains a reasonable load factor
+- Different values should produce very different hash codes (web security - bcrypt/salting passwords)
+
+### Applications
+- Take in any value and boil it down to a unique number (images, ADTs, files, etc.)
+- Hashing a string: add all characters (length?, ASCII representation?)
+- Cryptographic hash functions
+    + used in security context
+    + one-way function: can't reverse
+    
+## Load function (n/b)
+1. average number of elements in each bucket
+2. low load factor: wasted space
+3. high load factor: slow operations
+    + contains `O(n/b)`
+    + add `O(n/b)`
+    + remove `O(n/b)`)
+4. with b chosen to be close to n, we can approximate `O(1)` for operations
+
+## Hash table (naive)
+### Data structure
+```{Rcpp, eval = FALSE}
+HashTable::HashTable() {
+    // Initialize array of buckets
+    int *_elements = new int[NUM_BUCKETS];
+}
+```
+
+### Identity function
+```{Rcpp, eval = FALSE}
+int hash1(int elem) {
+    return elem;
+}
+```
+
+Issues: 
+
+1. Can lead to a sparse table
+2. Can't handle negative 
+3. We don't initialize the buckets, so there's a chance that an empty bucket could have a value
+    + (i.e. bucket N could have N in it as a "garbage" value leading to an incorrect check on contains)
+
+## Hash table (modulo)
+### Identity function
+```{Rcpp, eval = FALSE}
+int hash2(int elem) {
+    return abs(elem) % numBuckets;
+}
+```
+
+### Insert function
+```{Rcpp, eval = FALSE}
+void HashTable::insert(int elem) {
+    int bucket = hash1(elem);
+    _elements[bucket] = elem;
+}
+```
+
+## Hash table (pointers)
+### Collision resolution
+Hash collisions: when hash function assigns two different elements to the same bucket. <br>
+
+Array stores `ListNode*`:
+
+1. Each bucket will now be a linked list
+2. When we have a collision, we can add the new element to the front of the list in O(1)
+
+### Chaining Hash Table O(1)
+```{Rcpp, eval = FALSE}
+HashTable::HashTable() {
+    // double pointer: each array element is a pointer
+    // Initialize each bucket to the nullptr
+    ListNode **_elements = new ListNode*[NUM_BUCKETS}(); 
+}
+```
+
+### Insert into chaining hash table
+```{Rcpp, eval = FALSE}
+void HashTable::insert(int elem) {
+    int bucket = hash2(elem);
+    ListNode *bucket = _buckets[bucket];
+    
+    // Create new front of list, tack previous onto end;
+    ListNode *cur = new ListNode{elem, bucket};
+    _buckets[bucket] = cur;
+}
+```
+
+With several collisions, our contains and remove will be O(n) where n is the number of elements in the relevant bucket. 
+

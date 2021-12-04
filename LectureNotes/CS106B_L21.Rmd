@@ -1,0 +1,112 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 21: Link Lists"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 21: Linked Lists {.tabset}
+
+## Topics
+- Providing a cohesive interface to chains of link nodes with a LinkedList class
+- LinkedList class implementation
+- LinkedList methods
+
+## LinkedList class
+- Has the same public members as ArrayList, Vector, etc.
+- List is internally implemented as a chain of linked nodes
+    + keeps a pointer to its front node
+    + nullptr is the end of the list
+  
+```{Rcpp, eval = FALSE}
+class LinkedList {
+public:
+  LinkedList();
+  ~LinkedList();
+  void add(int value);
+  void clear();
+  int get(int index) const;
+  void insert(int index, int value);
+  bool isEmpty() const;
+  void remove(int index);
+  void set(int index, int value);
+  int size() const;
+
+private:
+  ListNode* front;
+  int size;
+}
+```
+
+## Linked list
+```{Rcpp, eval = FALSE}
+string contents = "{";
+ListNode* current = front; // don't damage list
+while (current != nullptr) {
+  contents += (integerToString(current->data)) + ", ";
+  current = current->next;
+}
+contents += "}";
+```
+
+## Implementation of add
+1) Empty list
+2) Non-empty list
+    + `while (current->next != nullptr) {...`
+    
+```{Rcpp, eval = FALSE}
+void LinkedList::add(int value) {
+  if (front == nullptr) {
+    front = new ListNode(value);
+  } else {
+    ListNode* current = front;
+    while (current->next != nullptr) {
+      current = current->next;
+    }
+    current->next = new ListNode(value);
+  }
+  size++;
+}
+```
+
+## Implementation of get - O(n)
+```{Rcpp, eval = FALSE}
+// Returns value in list at given index;
+// PreconditionL 0 <= index < size()
+int LinkedList::get(int index) {
+  ListNode* current = front;
+  for (int i = 0; i < index; i++) {
+    current = current->next;
+  }
+  return current->data;
+}
+```
+
+## Implementation of remove
+```{Rcpp, eval = FALSE}
+// Returns value in list at given index;
+// PreconditionL 0 <= index < size()
+void LinkedList::remove(int index) {
+  ListNode* trash;
+  if (index == 0 {
+    trash = front;
+    front = front->next;
+    delete trash;
+  } else {
+    current = front;
+    for (int i = 0; i <= index - 1; i++) {
+      current = current->next;
+    }
+    trash = current;
+    current = current->next;
+    delete trash;
+  }
+  size--;
+}
+```
+

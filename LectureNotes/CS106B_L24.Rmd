@@ -1,0 +1,75 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 24: Binary Search Trees"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 24: Binary Search Trees {.tabset}
+
+## Topics
+
+## AVL rotations
+1. Left-Left AVL rotation
+2. Right-left AVL rotation
+3. Right-Right AVL rotation
+4. Left-Right AVL rotation
+
+## BST balance strategies
+*AVL tree*: uses AVL rotations to guarantee balance <br>
+*Red-Black tree*: uses AVL rotations to guarantee that balance is off by no more than a constant factor <br>
+*Treap*: each node has two keys (BST key, min-heap key) and a value. insertion according to BST keys and BST order.
+
+## Tree traversals {.tabset}
+### Pre-order traversals
+```{Rcpp, eval = FALSE}
+void traverse(Node* node) {
+  if (node != NULL) {
+    cout << node->key << " ";
+    traverse(node->left);
+    traverse(node->right);
+  }
+}
+```
+
+### In-order traversals
+```{Rcpp, eval = FALSE}
+void traverse(Node* node) {
+  if (node != NULL) {
+    traverse(node->left);
+    cout << node->key << " ";
+    traverse(node->right);
+  }
+}
+```
+
+### Post-order traversals
+- Good for writing destructor for a BST class
+```{Rcpp, eval = FALSE}
+void traverse(Node* node) {
+  if (node != NULL) {
+    traverse(node->left);
+    traverse(node->right);
+    cout << node->key << " ";
+  }
+}
+```
+
+```{Rcpp, eval = FALSE}
+void bstDestructorRecursiveHelper(Node *node) {
+  if (node != nullptr) {
+    bstDestructorRecursiveHelper(node->left);
+    bstDestructorRecursiveHelper(node->right);
+    delete node;
+  }
+}
+```
+
+### Breath First Traveral
+- Print top-to-bottom, left-to-right order
+- use queue instead of recursion
