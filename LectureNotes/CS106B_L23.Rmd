@@ -1,0 +1,65 @@
+---
+title: "CS106B: Programming Abstractions"
+subtitle: "Lecture 23: Trees"
+author: "Olivia Beyer Bruvik"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lecture 23: Tree {.tabset}
+
+## Topics
+- Map implemented as a binary search tree
+- Big-O analysis of BST
+
+## Implementing map interface
+1) Binary Search Tree (C++'s STL uses a red-black tree)
+    - Pointer to the median element
+    - Two nodes to median on either side
+2) Hash table (Stanford's HashMap)
+
+## Binary Search Tree (Map)
+- Structure: any valid binary tree
+- Order: leftchild.key < self.key < rightchild.key
+    + no duplicate keys
+    + values go along for the ride w/ keys
+- Big-O: log(n) if balanced, but O(n) if not.
+- Operations:
+    + recursively repeat: start at root and go left if key < root, go right if key > root
+    
+## Treemap
+### `tree-map.h`
+```{Rcpp, eval = FALSE}
+private:
+  struct node {
+    Key key;
+    Value value;
+    node* left;
+    node* right;
+  };
+  int _size;
+  node* _root;
+};
+```
+
+### BST put()
+```{Rcpp, eval = FALSE}
+// if key > node's key:
+//    go right
+//    (if doesn't exist) place here
+// else if key < node's key:
+//    go left
+//    (if doesn't exist) place here
+// if key is equal
+//    update here
+// else there are no child roots
+//    that's the answer
+```
+
+## Big-O
+Worst case: insert cases in descending areas.
+Big-O: `O(N)`
